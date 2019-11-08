@@ -66,7 +66,7 @@ void get_BIN_U8(unsigned char *x)
     }
 }
 
-void catchInterrupt() interrupt 4
+void catchInterrupt() __interrupt 4
 {
     if(RI)
     {
