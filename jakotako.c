@@ -34,26 +34,19 @@ void init(int frequency)
 
 void put(unsigned char c)
 {
-    SBUF = c;
-    while(!TI){};
+    SBUF = c; // wysylanie znaku
+    while(!TI){}; // czekanie az znak zostanie wyslany
     TI = 0;
+    receivedFlag = 0;
 }
 
-void put_DEC_U8(uint16_t w) {
-    put(w);
-}
-
-void get_BIN_U8(unsigned char *x)
+void get(unsigned char *x)
 {
-    *x = 0b100001;
-    // chyba petla, bo powinnismy tutaj caly czas sie krecic dopoki ktos nie pyknie spacji
-    while (receivedCharacter != ' ')
+    if (receivedFlag && *x != 0x20)
     {
-        if(receivedFlag) {
-            *x << 1;
-            *x+= receivedCharacter - '0';
-            receivedFlag = 0;
-        }
+        input[counter]=*x;
+        put(*x);
+        counter++;
     }
 }
 
@@ -69,12 +62,23 @@ void catchInterrupt() __interrupt 4
 
 void main(void)
 {
-    uint8_t z1;
-    uint16_t w;
     init(19200);
+
     for(;;) {
-        get_BIN_U8(&z1);
-        w = z1 + 4;
-        put_DEC_U8(w);
+        get(&receivedCharacter);
+
+        // tu sprawdzamy czy ktos wyslal spacje lub tab
+        if ((receivedCharacter == 0x20 || receivedCharacter == 0x09) && receivedFlag)
+        {
+            put(' ');
+            input[counter] ='\0';
+            counter = 0;
+            while (input[counter] != 0x0) {
+               put(input[counter++]);
+            }
+            counter = 0;
+            put(0x0D);
+            put(0x0A);
+        }
     }
 }
