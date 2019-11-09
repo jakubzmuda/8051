@@ -10,9 +10,8 @@ typedef unsigned short uint16_t;
 unsigned char receivedCharacter;
 unsigned char receivedFlag;
 unsigned char input[100];
-unsigned char counter;
 
-void init(int frequency)
+void init(int frequency) // todo jakas mape zrobic
 {
     SCON = 0x50;
     TMOD &= 0x0f;
@@ -29,7 +28,6 @@ void init(int frequency)
     IE = 0x90;
 
     receivedFlag=0;
-    counter=0;
 }
 
 void put(unsigned char c)
@@ -41,15 +39,15 @@ void put(unsigned char c)
 
 void put_DEC_U8(uint16_t w) {
     put(w);
+    receivedCharacter = '\0';
 }
 
 void get_BIN_U8(unsigned char *x)
 {
-    *x = 0b100001;
-    // chyba petla, bo powinnismy tutaj caly czas sie krecic dopoki ktos nie pyknie spacji
+    *x = 0b100001; // todo jeszcze trzeba to usunac i dobrze zrobic te przesuniecia bitowe
     while (receivedCharacter != ' ')
     {
-        if(receivedFlag) {
+        if(receivedFlag && (receivedCharacter == '1' || receivedCharacter == '0')) {
             *x << 1;
             *x+= receivedCharacter - '0';
             receivedFlag = 0;
