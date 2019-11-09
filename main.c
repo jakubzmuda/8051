@@ -40,15 +40,16 @@ void put(unsigned char c)
 void put_DEC_U8(uint16_t w) {
     put(w);
     receivedCharacter = '\0';
+
 }
 
 void get_BIN_U8(unsigned char *x)
 {
-    *x = 0b100001; // todo jeszcze trzeba to usunac i dobrze zrobic te przesuniecia bitowe
+//    *x = 0b100001; // todo jeszcze trzeba to usunac i dobrze zrobic te przesuniecia bitowe
     while (receivedCharacter != ' ')
     {
         if(receivedFlag && (receivedCharacter == '1' || receivedCharacter == '0')) {
-            *x << 1;
+            *x = *x << 1;
             *x+= receivedCharacter - '0';
             receivedFlag = 0;
         }
@@ -74,5 +75,6 @@ void main(void)
         get_BIN_U8(&z1);
         w = z1 + 4;
         put_DEC_U8(w);
+        z1 = 0; // tutaj musimy wyzerowac kolesia
     }
 }
